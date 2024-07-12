@@ -1,41 +1,36 @@
 import { Box, Pagination } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import service from "../../services";
+import { useSelector } from "react-redux";
 
 const pageSize = 6;
 
-const AppPagination = ({ setPaginationItems }) => {
-  // useEffect(()=>{
-  //    const fetchData = async () =>{
-  //     try{
-  //         const result = await service.getData()
-  //         console.log(result.data.length)
-  //     } catch (error){
-  //         console.log(error)
-  //     }
-  //    }
-  //    fetchData()
-  // },[])
+const AppPagination = ({ setPaginationItems, items, value }) => {
   const [pagination, setPagination] = useState({
     count: 0,
     from: 0,
     to: pageSize,
   });
-  const items = useSelector((state) => state.cart.items);
-  const paginationItems = items.slice(pagination.from, pagination.to);
+
+  useEffect(() => {
+    const filteredItems = items.filter((item) => {
+      if (value === "all") return true;
+      return item.attributes.category === value;
+    });
+
+    setPagination((prev) => ({
+      ...prev,
+      count: filteredItems.length,
+    }));
+
+    const paginatedItems = filteredItems.slice(pagination.from, pagination.to);
+    setPaginationItems(paginatedItems);
+  }, [pagination.from, pagination.to, items, value]);
 
   const handleChange = (event, page) => {
     const from = (page - 1) * pageSize;
     const to = (page - 1) * pageSize + pageSize;
     setPagination({ ...pagination, from: from, to: to });
-    console.log(paginationItems.length);
   };
-  useEffect(() => {
-    setPagination({ ...pagination, count: items.length });
-    setPaginationItems(paginationItems);
-    console.log(paginationItems);
-  }, [pagination.from, pagination.to]);
 
   return (
     <Box
