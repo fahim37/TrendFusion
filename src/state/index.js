@@ -4,12 +4,16 @@ const initialState = {
   isCartOpen: false,
   cart: [],
   items: [],
+  searchText: "",
 };
 
 export const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    addSearchText: (state, payload) => {
+      state.searchText = payload.payload;
+    },
     setItems: (state, action) => {
       state.items = action.payload;
     },
@@ -53,6 +57,7 @@ export const {
   increaseCount,
   decreaseCount,
   setIsCartOpen,
+  addSearchText,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

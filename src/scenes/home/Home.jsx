@@ -6,7 +6,7 @@ import Subscribe from './Subscribe';
 const Home = () => {
   return (
     <div className="home">
-      <MainCarousel/>
+      {/* <MainCarousel/> */}
       <ShoppingList/>
       <Subscribe/>
       </div>
