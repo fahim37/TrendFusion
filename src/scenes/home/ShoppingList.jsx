@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -34,6 +34,7 @@ const ShoppingList = () => {
   const items = useSelector((state) => state.cart.items);
   const searchText = useSelector((state) => state.cart.searchText);
   const breakPoint = useMediaQuery("(min-width:600px)");
+  const productRef = useRef(null);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -75,38 +76,59 @@ const ShoppingList = () => {
   const bestSellersItems = paginationItems.filter(
     (item) => item.attributes.category === "bestSellers"
   );
+  const displayedItems = paginationItems.slice(0, 6);
 
   return (
     <>
-      <Box width={"80%"} margin={"80px auto"}>
+      <Box width={"80%"} margin={"80px auto"} id="products" ref={productRef}>
         <Typography variant="h3" textAlign={"center"}>
           Featured <b>Products</b>
         </Typography>
-        <Tabs
-          textColor="primary"
-          indicatorColor="primary"
-          value={value}
-          onChange={handleChange}
-          centered
-          TabIndicatorProps={{ sx: { display: breakPoint ? "block" : "none" } }}
-          sx={{
-            m: "25px",
-            "& .MuiTabs-flexContainer": {
-              flexWrap: "wrap",
-            },
-          }}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          width="100%"
         >
-          <Tab label="ALL" value="all" />
-          <Tab label="NEW ARRIVALS" value="newArrivals" />
-          <Tab label="BEST SELLERS" value="bestSellers" />
-          <Tab label="TOP RATED" value="topRated" />
-        </Tabs>
-        {/* ----------Search field----------------- */}
-        <TextField
-          onChange={(e) => onAddSearchText(e.target.value)}
-          label="Outlined"
-          variant="outlined"
-        />
+          <Box
+            flexGrow={1}
+            display="flex"
+            justifyContent="center"
+            margin={breakPoint ? "0 0 0 13%" : "0"}
+          >
+            <Tabs
+              textColor="primary"
+              indicatorColor="primary"
+              value={value}
+              onChange={handleChange}
+              TabIndicatorProps={{
+                sx: { display: breakPoint ? "block" : "none" },
+              }}
+              sx={{
+                m: "25px",
+                "& .MuiTabs-flexContainer": {
+                  flexWrap: "wrap",
+                },
+              }}
+            >
+              <Tab label="ALL" value="all" />
+              <Tab label="NEW ARRIVALS" value="newArrivals" />
+              <Tab label="BEST SELLERS" value="bestSellers" />
+              <Tab label="TOP RATED" value="topRated" />
+            </Tabs>
+          </Box>
+          <Box
+            alignItems={"center"}
+            justifyContent={"center"}
+            margin={!breakPoint ? "0" : "0 4% 0 0"}
+          >
+            <TextField
+              onChange={(e) => onAddSearchText(e.target.value)}
+              label="Search..."
+              variant="outlined"
+            />
+          </Box>
+        </Box>
 
         {loading && (
           <Box textAlign={"center"}>
@@ -124,7 +146,7 @@ const ShoppingList = () => {
             columnGap="1.33%"
           >
             {value === "all" &&
-              paginationItems.map((item) => (
+              displayedItems.map((item) => (
                 <Item item={item} key={`${item.attributes.name}-${item.id}`} />
               ))}
             {value === "newArrivals" &&

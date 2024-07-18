@@ -16,6 +16,13 @@ export const heroTextureImports = importAll(
   require.context("../../assets", false, /\.(png|jpe?g|svg)$/)
 );
 
+const handleScroll = () => {
+  const productsSection = document.getElementById("products");
+  if (productsSection) {
+    productsSection.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
 const MainCarousel = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   return (
@@ -56,9 +63,7 @@ const MainCarousel = () => {
       )}
     >
       {Object.values(heroTextureImports).map((texture, index) => (
-        <Box 
-        margin={"60px 0 0 0"}
-        key={`carousel-image-${index}`}>
+        <Box margin={"60px 0 0 0"} key={`carousel-image-${index}`}>
           <img
             src={texture}
             alt={`carousel-${index}`}
@@ -81,6 +86,8 @@ const MainCarousel = () => {
             right={isNonMobile ? undefined : "0"}
             margin={isNonMobile ? undefined : "0 auto"}
             maxWidth={isNonMobile ? undefined : "240px"}
+            onClick={handleScroll}
+            sx={{ cursor: "pointer" }}
           >
             <Typography color={shades.secondary[200]}>-- NEW ITEMS</Typography>
             <Typography variant="h1">Summer Sale</Typography>
@@ -88,6 +95,7 @@ const MainCarousel = () => {
               fontWeight="bold"
               color={shades.secondary[300]}
               sx={{ textDecoration: "underline" }}
+              onClick={() => window.location.replace("/#about")}
             >
               Discover More
             </Typography>
