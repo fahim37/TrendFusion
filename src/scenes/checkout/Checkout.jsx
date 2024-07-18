@@ -8,9 +8,8 @@ import Payment from "./Payment";
 import Shipping from "./Shipping";
 import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe(
-  "pk_test_51LgU7yConHioZHhlAcZdfDAnV9643a7N1CMpxlKtzI1AUWLsRyrord79GYzZQ6m8RzVnVQaHsgbvN1qSpiDegoPi006QkO0Mlc"
-);
+console.log("Stripe API Key:", process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 const Checkout = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -21,7 +20,6 @@ const Checkout = () => {
   const handleFormSubmit = async (values, actions) => {
     setActiveStep(activeStep + 1);
 
-    // this copies the billing address onto shipping address
     if (isFirstStep && values.shippingAddress.isSameAddress) {
       actions.setFieldValue("shippingAddress", {
         ...values.billingAddress,
@@ -47,15 +45,29 @@ const Checkout = () => {
       })),
     };
 
-    const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/orders`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/api/orders`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Failed to create Stripe session", await response.text());
+      return;
+    }
+
     const session = await response.json();
-    await stripe.redirectToCheckout({
+
+    const { error } = await stripe.redirectToCheckout({
       sessionId: session.id,
     });
+
+    if (error) {
+      console.error("Stripe redirect to checkout error", error.message);
+    }
   }
 
   return (
